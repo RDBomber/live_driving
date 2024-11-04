@@ -12,6 +12,13 @@ void live_driving::create_hooks(const MODULEINFO& module_info) {
                 const auto scene_id = ctx.rdx;
                 on_change_scene(scene_id);
             }
+        },
+        {
+            "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 41 48",
+            [](safetyhook::Context& ctx) {
+                const auto scene_id = ctx.rdx;
+                on_change_scene(scene_id);
+            }
         }
     };
 
