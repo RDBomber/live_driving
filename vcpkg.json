@@ -1,0 +1,11 @@
+{
+    "name": "main",
+    "version-string": "latest",
+    "builtin-baseline": "4f746bc66438fce2b900c3ba6094a483b871b045",
+    "dependencies": [
+        {
+            "name": "spdlog",
+            "version>=": "1.14.1"
+        }
+    ]
+}
