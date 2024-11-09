@@ -6,6 +6,23 @@
         {
             "name": "spdlog",
             "version>=": "1.14.1"
+        },
+        {
+            "name": "curl",
+            "version>=": "8.10.1#2",
+            "features": ["websockets"]
+        },
+        {
+            "name": "rapidjson",
+            "version>=": "2023-07-17#1"
+        },
+        {
+            "name": "cryptopp",
+            "version>=": "8.9.0#1"
+        },
+        {
+            "name": "yaml-cpp",
+            "version>=": "0.8.0#1"
         }
     ]
 }

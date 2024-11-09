@@ -4,7 +4,10 @@
 #include "live_driving/hook.hpp"
 #include "live_driving/util.hpp"
 
-void live_driving::create_hooks(const MODULEINFO& module_info) {
+void live_driving::create_hooks(const MODULEINFO& module_info, obs_client* obs_client, const std::unordered_map<std::string, std::string>& scene_map) {
+    client = obs_client;
+    map = scene_map;
+
     std::vector<std::tuple<std::string, safetyhook::MidHookFn>> patterns = {
         {
             "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 8B 41 48 45 0F",
@@ -43,4 +46,15 @@ void live_driving::create_hooks(const MODULEINFO& module_info) {
 
 void live_driving::on_change_scene(std::uint64_t scene_id) {
     spdlog::info("Scene changed to {}", scene_id);
+
+    if(client == nullptr) {
+        return;
+    }
+
+    if(const std::string key = std::to_string(scene_id); map.contains(key)) {
+        client->switch_scene(map[key]);
+    }
+    else if(map.contains("default")) {
+        client->switch_scene(map["default"]);
+    }
 }

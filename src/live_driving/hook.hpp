@@ -4,9 +4,13 @@
 #include <windows.h>
 #include <psapi.h>
 
+#include "live_driving/obs_client.hpp"
+
 namespace live_driving {
     inline safetyhook::MidHook on_change_scene_hook;
+    inline obs_client* client;
+    inline std::unordered_map<std::string, std::string> map;
 
-    void create_hooks(const MODULEINFO& module_info);
+    void create_hooks(const MODULEINFO& module_info, obs_client* obs_client, const std::unordered_map<std::string, std::string>& scene_map);
     void on_change_scene(std::uint64_t scene_id);
 }

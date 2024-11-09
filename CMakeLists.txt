@@ -8,6 +8,10 @@ include(cmake/get_cpm.cmake)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 find_package(spdlog CONFIG REQUIRED)
+find_package(CURL REQUIRED)
+find_package(RapidJSON CONFIG REQUIRED)
+find_package(cryptopp CONFIG REQUIRED)
+find_package(yaml-cpp CONFIG REQUIRED)
 
 CPMAddPackage(
         NAME safetyhook
@@ -17,10 +21,10 @@ CPMAddPackage(
             "SAFETYHOOK_FETCH_ZYDIS ON"
 )
 
-file(GLOB_RECURSE sources src/*.cpp)
+file(GLOB_RECURSE sources src/live_driving/*.cpp)
 
 add_library(${PROJECT_NAME} SHARED ${sources})
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)
-target_link_libraries(${PROJECT_NAME} PRIVATE safetyhook spdlog::spdlog)
+target_link_libraries(${PROJECT_NAME} PRIVATE safetyhook spdlog::spdlog CURL::libcurl rapidjson cryptopp::cryptopp yaml-cpp::yaml-cpp)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)

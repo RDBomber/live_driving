@@ -3,10 +3,47 @@
 #include <vector>
 #include <psapi.h>
 #include <spdlog/spdlog.h>
+#include <yaml-cpp/yaml.h>
+#include <filesystem>
+#include <thread>
 
+#include "live_driving/obs_client.hpp"
 #include "live_driving/hook.hpp"
 
 DWORD initialize(LPVOID param) {
+    std::filesystem::path config_path = "live_driving.yaml";
+    if(!exists(config_path)) {
+        spdlog::error("Config file not found");
+        return EXIT_FAILURE;
+    }
+
+    YAML::Node config;
+    try {
+        config = YAML::LoadFile(config_path.string());
+    }
+    catch(const std::exception& e) {
+        spdlog::error("Failed to load config file: {}", e.what());
+        return EXIT_FAILURE;
+    }
+
+    std::optional<live_driving::obs_client> obs_client;
+    std::unordered_map<std::string, std::string> map;
+
+    if(config["obs_url"]) {
+        auto url = config["obs_url"].as<std::string>();
+        std::string password;
+        if(config["obs_password"]) {
+            password = config["obs_password"].as<std::string>();
+        }
+
+        if(config["scene_map"]) {
+            map = config["scene_map"].as<std::unordered_map<std::string, std::string>>();
+        }
+
+        live_driving::obs_client client(url, password);
+        obs_client = client;
+    }
+
     const std::vector<std::string> game_modules = {
         "bm2dx.dll",
         "soundvoltex.dll",
@@ -24,7 +61,14 @@ DWORD initialize(LPVOID param) {
 
         MODULEINFO module_info;
         GetModuleInformation(current_process, module_handle, &module_info, sizeof(module_info));
-        live_driving::create_hooks(module_info);
+        create_hooks(module_info, obs_client.has_value() ? &obs_client.value() : nullptr, map);
+
+        if(obs_client.has_value()) {
+            std::thread([&obs_client = obs_client] {
+                obs_client->listen();
+            }).join();
+        }
+
         break;
     }
 
