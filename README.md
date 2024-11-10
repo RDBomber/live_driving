@@ -19,4 +19,17 @@ scene_map: # Mapping of game scene IDs to OBS scenes
 
 # Scene IDs
 Here are some IDs I've found while testing
+
+Feel free to contribute more by creating a PR
 ## IIDX 31 (may work for other versions)
+- 66 - DAN COURSE gameplay
+- 69 - STANDARD gameplay
+- 70 - FREE gameplay
+- 72 - HAZARD gameplay
+- 74 - STEP UP gameplay
+- 75 - PREMIUM FREE gameplay
+- 76 - ARENA gameplay
+- 77 - BPL BATTLE gameplay
+
+## How to find scene IDs
+When you omit `obs_url` in the configuration, the hook will only output scene IDs to the console, making it easier to find the scene IDs for your game.

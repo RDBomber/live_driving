@@ -28,3 +28,8 @@ add_library(${PROJECT_NAME} SHARED ${sources})
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 target_link_libraries(${PROJECT_NAME} PRIVATE safetyhook spdlog::spdlog CURL::libcurl rapidjson cryptopp::cryptopp yaml-cpp::yaml-cpp)
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
+
+set(CONFIGURATIONS Debug Release)
+foreach(CONFIG ${CONFIGURATIONS})
+    file(COPY live_driving.yml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG})
+endforeach()
