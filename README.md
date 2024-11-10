@@ -6,7 +6,7 @@ This is a simple dll hook for capturing scene changes in select BEMANI games.
 - SOUND VOLTEX
 
 # Usage
-Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.yml` is placed next to `live_driving.dll`.
+Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.yaml` is placed next to `live_driving.dll`.
 
 # Configuration
 ```yml
