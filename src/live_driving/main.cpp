@@ -10,21 +10,43 @@
 #include "live_driving/obs_client.hpp"
 #include "live_driving/hook.hpp"
 
-DWORD initialize(LPVOID param) {
-    std::filesystem::path config_path = "live_driving.yaml";
-    if(!exists(config_path)) {
-        spdlog::error("Config file not found");
-        return EXIT_FAILURE;
+struct initialize_params {
+    HMODULE dll_instance;
+    YAML::Node config;
+};
+
+void handle_debug_mode() {
+    AllocConsole();
+    FILE* file;
+    freopen_s(&file, "CONOUT$", "w", stdout);
+    freopen_s(&file, "CONOUT$", "w", stderr);
+
+    spdlog::info("Debug mode enabled");
+}
+
+std::filesystem::path get_current_directory(const HMODULE dll_instance) {
+    char path[MAX_PATH];
+    if(!GetModuleFileNameA(dll_instance, path, MAX_PATH)) {
+        spdlog::error("Failed to get module file name");
+        exit(EXIT_FAILURE);
     }
 
-    YAML::Node config;
-    try {
-        config = YAML::LoadFile(config_path.string());
+    std::filesystem::path module_path(path);
+    return module_path.parent_path();
+}
+
+YAML::Node get_config(const std::filesystem::path& config_path) {
+    if(!exists(config_path)) {
+        spdlog::error("Config file not found");
+        exit(EXIT_FAILURE);
     }
-    catch(const std::exception& e) {
-        spdlog::error("Failed to load config file: {}", e.what());
-        return EXIT_FAILURE;
-    }
+
+    return YAML::LoadFile(config_path.string());
+}
+
+DWORD initialize(LPVOID param) {
+    initialize_params* params = static_cast<initialize_params*>(param);
+    auto config = params->config;
 
     std::optional<live_driving::obs_client> obs_client;
     std::unordered_map<std::string, std::string> map;
@@ -47,6 +69,7 @@ DWORD initialize(LPVOID param) {
     const std::vector<std::string> game_modules = {
         "bm2dx.dll",
         "soundvoltex.dll",
+        "sv6c.exe",
     };
 
     const auto current_process = GetCurrentProcess();
@@ -72,6 +95,9 @@ DWORD initialize(LPVOID param) {
         break;
     }
 
+    spdlog::warn("Could not find any supported game modules");
+    delete params;
+
     return EXIT_SUCCESS;
 }
 
@@ -80,9 +106,23 @@ BOOL DllMain(const HMODULE dll_instance, const DWORD reason, LPVOID) {
         return TRUE;
     }
 
+    const auto module_directory = get_current_directory(dll_instance);
+    const auto config_path = module_directory / "live_driving.yaml";
+    auto config = get_config(config_path);
+
+    if(config["debug"]) {
+        if(config["debug"].as<bool>()) {
+            handle_debug_mode();
+        }
+    }
+
+    const auto params = new initialize_params;
+    params->dll_instance = dll_instance;
+    params->config = config;
+
     DisableThreadLibraryCalls(dll_instance);
 
-    CreateThread(nullptr, 0, initialize, dll_instance, 0, nullptr);
+    CreateThread(nullptr, 0, initialize, params, 0, nullptr);
 
     return TRUE;
 }

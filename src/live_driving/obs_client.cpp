@@ -58,12 +58,15 @@ void live_driving::obs_client::switch_scene(const std::string& scene_name) const
     send(payload);
 }
 
-void live_driving::obs_client::connect() const {
+void live_driving::obs_client::connect() {
     if(const auto res = curl_easy_perform(curl); res != CURLE_OK) {
         spdlog::error("Failed to connect to websocket server: {}", curl_easy_strerror(res));
+        connected = false;
+        return;
     }
 
     spdlog::info("Connected to websocket server");
+    connected = true;
 }
 
 [[noreturn]] void live_driving::obs_client::listen() {
@@ -73,6 +76,11 @@ void live_driving::obs_client::connect() const {
     char data[allocation_size];
 
     while(true) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        if(!connected) {
+            continue;
+        }
+
         const auto result = curl_ws_recv(curl, data, allocation_size, &return_len, &frame);
 
         if(result == CURLE_OK) {
@@ -88,7 +96,6 @@ void live_driving::obs_client::connect() const {
         }
 
         if(result == CURLE_AGAIN) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
 
@@ -99,7 +106,6 @@ void live_driving::obs_client::connect() const {
         }
 
         spdlog::error("Failed to receive data from websocket server: {} ({})", curl_easy_strerror(result), static_cast<std::underlying_type_t<CURLcode>>(result));
-        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
 

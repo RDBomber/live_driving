@@ -16,13 +16,14 @@ namespace live_driving {
         static inline bool curl_initialized = false;
 
         bool authenticated = false;
+        bool connected = false;
 
         std::string url;
         std::string password;
 
         CURL* curl = nullptr;
 
-        void connect() const;
+        void connect();
 
         void handle_response(const char* data);
         void handle_authentication(const rapidjson::Document& document) const;
