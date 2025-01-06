@@ -3,7 +3,7 @@ This is a simple dll hook for capturing scene changes in select BEMANI games.
 
 # Supported games
 - beatmania IIDX
-- SOUND VOLTEX
+- SOUND VOLTEX (including コナステ)
 
 # Usage
 Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.yaml` is placed next to `live_driving.dll`.
@@ -12,6 +12,7 @@ Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.y
 ```yml
 obs_url: "ws://localhost:4455" # The address of your OBS websocket server
 obs_password: "password" # Optional password if you wish to use authorization
+debug: true # Spawns a console (useful for コナステ games)
 scene_map: # Mapping of game scene IDs to OBS scenes
   1: "IIDX"
   default: "IIDX no cam" # `default` will trigger on any scene that is not mapped, you can also omit this if you don't want that behaviour
