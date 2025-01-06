@@ -1,28 +1,22 @@
 {
     "name": "main",
     "version-string": "latest",
-    "builtin-baseline": "65be7019941e1401e02daaba0738cab2c8a4a355",
     "dependencies": [
         {
-            "name": "spdlog",
-            "version>=": "1.15.0"
+            "name": "spdlog"
         },
         {
             "name": "curl",
-            "version>=": "8.10.1#2",
             "features": ["websockets"]
         },
         {
-            "name": "rapidjson",
-            "version>=": "2023-07-17#1"
+            "name": "rapidjson"
         },
         {
-            "name": "cryptopp",
-            "version>=": "8.9.0#1"
+            "name": "cryptopp"
         },
         {
-            "name": "yaml-cpp",
-            "version>=": "0.8.0#1"
+            "name": "yaml-cpp"
         }
     ]
 }
