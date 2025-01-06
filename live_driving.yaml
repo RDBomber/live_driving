@@ -1,5 +1,6 @@
 obs_url: "ws://localhost:4455"
 obs_password: "password"
+debug: true
 scene_map:
   1: "IIDX"
   default: "IIDX no cam"
