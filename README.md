@@ -32,5 +32,12 @@ Feel free to contribute more by creating a PR
 - 76 - ARENA gameplay
 - 77 - BPL BATTLE gameplay
 
+## SOUND VOLTEX (コナステ)
+- 16 - Music Select
+- 41 - Gameplay
+- 14 - Result
+- 34 - SKILL ANALYZER select
+- 15 - SKILL ANALYZER result
+
 ## How to find scene IDs
 When you omit `obs_url` in the configuration, the hook will only output scene IDs to the console, making it easier to find the scene IDs for your game.
