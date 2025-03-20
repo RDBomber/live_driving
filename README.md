@@ -34,9 +34,9 @@ Feel free to contribute more by creating a PR
 
 ## SOUND VOLTEX (コナステ)
 - 16 - Music Select
-- 41 - Gameplay
+- 40 - Gameplay
 - 14 - Result
-- 34 - SKILL ANALYZER select
+- 33 - SKILL ANALYZER select
 - 15 - SKILL ANALYZER result
 
 ## How to find scene IDs
