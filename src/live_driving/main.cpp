@@ -70,6 +70,7 @@ DWORD initialize(LPVOID param) {
         "bm2dx.dll",
         "soundvoltex.dll",
         "sv6c.exe",
+        "bm2dx.exe",
     };
 
     const auto current_process = GetCurrentProcess();
