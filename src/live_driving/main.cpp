@@ -50,6 +50,7 @@ DWORD initialize(LPVOID param) {
 
     std::optional<live_driving::obs_client> obs_client;
     std::unordered_map<std::string, std::string> map;
+    auto use_rtti = config["use_rtti"] ? config["use_rtti"].as<bool>() : false;
 
     if(config["obs_url"]) {
         auto url = config["obs_url"].as<std::string>();
@@ -84,7 +85,7 @@ DWORD initialize(LPVOID param) {
 
         MODULEINFO module_info;
         GetModuleInformation(current_process, module_handle, &module_info, sizeof(module_info));
-        create_hooks(module_info, obs_client.has_value() ? &obs_client.value() : nullptr, map);
+        create_hooks(module_info, obs_client.has_value() ? &obs_client.value() : nullptr, map, use_rtti);
 
         if(obs_client.has_value()) {
             std::thread([&obs_client = obs_client] {
