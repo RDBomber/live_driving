@@ -25,4 +25,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
 
-file(COPY live_driving.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE})
+set(CONFIGS Debug Release)
+foreach(CONFIG ${CONFIGS})
+    file(COPY live_driving.yaml DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG})
+endforeach()
