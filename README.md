@@ -2,7 +2,7 @@
 This is a simple dll hook for capturing scene changes in select BEMANI games.
 
 # Supported games
-- beatmania IIDX
+- beatmania IIDX (including コナステ)
 - SOUND VOLTEX (including コナステ)
 
 # Usage
