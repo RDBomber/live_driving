@@ -53,11 +53,11 @@ jobs:
       - name: Run CMake+vcpkg+Ninja+CTest to build packages and generate/build/test the code.
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'ninja-multi-vcpkg'
-          buildPreset: 'ninja-vcpkg-release'
+          configurePreset: 'ninja-multi-config'
+          buildPreset: 'release'
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: live_driving
-          path: build/ninja-multi-vcpkg/Release
+          path: build/ninja-multi-config/Release
