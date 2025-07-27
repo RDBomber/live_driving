@@ -2,12 +2,12 @@
     "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 21,
+        "minor": 29,
         "patch": 0
     },
     "configurePresets": [
         {
-            "name": "Ninja Multi-Config",
+            "name": "ninja-multi-config",
             "binaryDir": "${sourceDir}/build/${presetName}",
             "generator": "Ninja Multi-Config",
             "toolchainFile": "${sourceDir}/vcpkg/scripts/buildsystems/vcpkg.cmake",
@@ -18,13 +18,13 @@
     ],
     "buildPresets": [
         {
-            "name": "Debug",
-            "configurePreset": "Ninja Multi-Config",
+            "name": "debug",
+            "configurePreset": "ninja-multi-config",
             "configuration": "Debug"
         },
         {
-            "name": "Release",
-            "configurePreset": "Ninja Multi-Config",
+            "name": "release",
+            "configurePreset": "ninja-multi-config",
             "configuration": "Release"
         }
     ]
