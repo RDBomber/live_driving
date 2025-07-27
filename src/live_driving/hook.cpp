@@ -35,10 +35,21 @@ void live_driving::create_hooks(const MODULEINFO& module_info, obs_client* obs_c
     };
 
     if (use_rtti) {
-        patterns.insert(patterns.begin(), {
+        // Arcade
+        const auto it = patterns.insert(patterns.begin(), {
             "89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7",
             [](safetyhook::Context& ctx) {
                 const auto scene_id = ctx.rcx;
+                const auto scene_name = get_class_name(game_module, ctx.rbx);
+                on_change_scene(scene_id, scene_name);
+            }
+        });
+
+        // INFINITAS
+        patterns.insert(it + 1, {
+            "89 05 ?? ?? ?? ?? 48 8B CB 48 8B 03 FF 50",
+            [](safetyhook::Context& ctx) {
+                const auto scene_id = ctx.rax;
                 const auto scene_name = get_class_name(game_module, ctx.rbx);
                 on_change_scene(scene_id, scene_name);
             }
