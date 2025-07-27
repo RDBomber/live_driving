@@ -3,5 +3,9 @@ obs_password: "password"
 debug: true
 use_rtti: true
 scene_map:
-  1: "IIDX"
-  default: "IIDX no cam"
+  CTestModeFlow:
+    obs_scene: "IIDX"
+    timeout: 1000
+  default:
+    obs_scene: "IIDX no cam"
+    timeout: 0

@@ -8,6 +8,7 @@
 #include <rapidjson/writer.h>
 #include <chrono>
 #include <thread>
+#include <future>
 
 #include "live_driving/obs_client.hpp"
 
@@ -28,7 +29,7 @@ live_driving::obs_client::obs_client(std::string url, std::string password): url
     connect();
 }
 
-void live_driving::obs_client::switch_scene(const std::string& scene_name) const {
+void live_driving::obs_client::switch_scene(const scene_config& config) const {
     if(!authenticated) {
         return;
     }
@@ -52,10 +53,14 @@ void live_driving::obs_client::switch_scene(const std::string& scene_name) const
     payload["d"].AddMember(request_data_key, rapidjson::Value(rapidjson::kObjectType), payload.GetAllocator());
 
     rapidjson::Value scene_name_key("sceneName", payload.GetAllocator());
-    rapidjson::Value scene_name_value(scene_name.c_str(), payload.GetAllocator());
+    rapidjson::Value scene_name_value(config.obs_scene.c_str(), payload.GetAllocator());
     payload["d"]["requestData"].AddMember(scene_name_key, scene_name_value, payload.GetAllocator());
 
-    send(payload);
+    auto timeout = config.timeout;
+    std::thread([this, payload = std::move(payload), timeout] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        send(payload);
+    }).detach();
 }
 
 void live_driving::obs_client::connect() {

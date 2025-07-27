@@ -3,16 +3,15 @@
 #include <vector>
 #include <psapi.h>
 #include <spdlog/spdlog.h>
-#include <yaml-cpp/yaml.h>
 #include <filesystem>
-#include <thread>
 
 #include "live_driving/obs_client.hpp"
 #include "live_driving/hook.hpp"
+#include "live_driving/config.hpp"
 
 struct initialize_params {
-    HMODULE dll_instance;
-    YAML::Node config;
+    HMODULE dll_instance = nullptr;
+    live_driving::app_config config;
 };
 
 void handle_debug_mode() {
@@ -35,37 +34,20 @@ std::filesystem::path get_current_directory(const HMODULE dll_instance) {
     return module_path.parent_path();
 }
 
-YAML::Node get_config(const std::filesystem::path& config_path) {
-    if(!exists(config_path)) {
-        spdlog::error("Config file not found");
+live_driving::app_config get_config(const std::filesystem::path& config_path) {
+    try {
+        return live_driving::get_config(config_path);
+    }
+    catch(const std::exception& e) {
+        const auto message = std::format("Failed to load config: {}", e.what());
+        MessageBox(nullptr, message.c_str(), "live_driving.dll", MB_OK);
         exit(EXIT_FAILURE);
     }
-
-    return YAML::LoadFile(config_path.string());
 }
 
 DWORD initialize(LPVOID param) {
-    initialize_params* params = static_cast<initialize_params*>(param);
+    auto* params = static_cast<initialize_params*>(param);
     auto config = params->config;
-
-    std::optional<live_driving::obs_client> obs_client;
-    std::unordered_map<std::string, std::string> map;
-    auto use_rtti = config["use_rtti"] ? config["use_rtti"].as<bool>() : false;
-
-    if(config["obs_url"]) {
-        auto url = config["obs_url"].as<std::string>();
-        std::string password;
-        if(config["obs_password"]) {
-            password = config["obs_password"].as<std::string>();
-        }
-
-        if(config["scene_map"]) {
-            map = config["scene_map"].as<std::unordered_map<std::string, std::string>>();
-        }
-
-        live_driving::obs_client client(url, password);
-        obs_client = client;
-    }
 
     const std::vector<std::string> game_modules = {
         "bm2dx.dll",
@@ -86,14 +68,7 @@ DWORD initialize(LPVOID param) {
 
         MODULEINFO module_info;
         GetModuleInformation(current_process, module_handle, &module_info, sizeof(module_info));
-        create_hooks(module_info, obs_client.has_value() ? &obs_client.value() : nullptr, map, use_rtti);
-
-        if(obs_client.has_value()) {
-            std::thread([&obs_client = obs_client] {
-                obs_client->listen();
-            }).join();
-        }
-
+        create_hooks(module_info, config);
         break;
     }
 
@@ -110,12 +85,10 @@ BOOL DllMain(const HMODULE dll_instance, const DWORD reason, LPVOID) {
 
     const auto module_directory = get_current_directory(dll_instance);
     const auto config_path = module_directory / "live_driving.yaml";
-    auto config = get_config(config_path);
+    const auto config = get_config(config_path);
 
-    if(config["debug"]) {
-        if(config["debug"].as<bool>()) {
-            handle_debug_mode();
-        }
+    if(config.debug) {
+        handle_debug_mode();
     }
 
     const auto params = new initialize_params;

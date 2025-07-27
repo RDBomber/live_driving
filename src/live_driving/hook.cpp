@@ -12,9 +12,7 @@ std::string get_class_name(const MODULEINFO& module_info, const std::uintptr_t b
     return std::string(desc->name + 4, std::strlen(desc->name) - 6);
 }
 
-void live_driving::create_hooks(const MODULEINFO& module_info, obs_client* obs_client, const std::unordered_map<std::string, std::string>& scene_map, bool use_rtti) {
-    client = obs_client;
-    map = scene_map;
+void live_driving::create_hooks(const MODULEINFO& module_info, app_config& config) {
     static const auto game_module = module_info;
 
     std::vector<std::tuple<std::string, safetyhook::MidHookFn>> patterns = {
@@ -34,7 +32,7 @@ void live_driving::create_hooks(const MODULEINFO& module_info, obs_client* obs_c
         }
     };
 
-    if (use_rtti) {
+    if (config.use_rtti) {
         // Arcade
         const auto it = patterns.insert(patterns.begin(), {
             "89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7",
@@ -69,6 +67,16 @@ void live_driving::create_hooks(const MODULEINFO& module_info, obs_client* obs_c
 
         spdlog::info("scene change function found at: {}", static_cast<void*>(hook_target));
         on_change_scene_hook = create_mid(hook_target, callback);
+
+        if(!config.obs_url.empty() && !config.obs_password.empty()) {
+            client = new obs_client(config.obs_url, config.obs_password);
+            map = config.scene_map;
+
+            std::thread([] {
+                client->listen();
+            }).join();
+        }
+
         return;
     }
 
