@@ -11,6 +11,6 @@ namespace live_driving {
     inline obs_client* client;
     inline std::unordered_map<std::string, std::string> map;
 
-    void create_hooks(const MODULEINFO& module_info, obs_client* obs_client, const std::unordered_map<std::string, std::string>& scene_map);
-    void on_change_scene(std::uint64_t scene_id);
+    void create_hooks(const MODULEINFO& module_info, obs_client* obs_client, const std::unordered_map<std::string, std::string>& scene_map, bool use_rtti);
+    void on_change_scene(std::uint64_t scene_id, const std::string& scene_name = "");
 }

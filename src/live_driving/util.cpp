@@ -20,9 +20,6 @@ std::uint8_t* live_driving::find_pattern(std::uint8_t* memory, const std::uint64
     while(i < pattern_size) {
         if(pattern[i] == '?') {
             pattern_bytes.push_back(-1);
-            if(i + 1 < pattern_size && pattern[i + 1] == '?') {
-                i++;
-            }
         }
         else {
             pattern_bytes.push_back(std::stoi(pattern.substr(i, 2), nullptr, 16));
