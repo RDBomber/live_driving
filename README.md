@@ -17,7 +17,7 @@ use_rtti: true # Uses RTTI class names for scene mapping, no longer have to gues
 scene_map: # Mapping of game scene IDs or names (when using RTTI) to OBS scenes
   CTestModeFlow:
     obs_scene: "IIDX"
-    timeout: 1000
+    timeout: 1000 # Time in milliseconds after which the request will be sent to your OBS client
   default: # default will trigger on any scene that is not mapped, you can also omit this if you don't want that behaviour
     obs_scene: "IIDX no cam"
     timeout: 0
