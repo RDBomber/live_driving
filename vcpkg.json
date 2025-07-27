@@ -1,25 +1,32 @@
 {
-    "name": "main",
-    "version-string": "latest",
+    "name": "live-driving",
+    "version": "1.0.0",
+    "builtin-baseline": "f2e1c41da38c71be74ef48684666991929b45418",
     "dependencies": [
         {
-            "name": "spdlog"
+            "name": "spdlog",
+            "version>=": "1.15.3"
         },
         {
             "name": "curl",
+            "version>=": "8.15.0",
             "features": ["websockets"]
         },
         {
-            "name": "rapidjson"
+            "name": "rapidjson",
+            "version>=": "2025-02-26"
         },
         {
-            "name": "cryptopp"
+            "name": "cryptopp",
+            "version>=": "8.9.0#1"
         },
         {
-            "name": "yaml-cpp"
+            "name": "yaml-cpp",
+            "version>=": "0.8.0#3"
         },
         {
-            "name": "safetyhook"
+            "name": "safetyhook",
+            "version>=": "0.6.9"
         }
     ]
 }
