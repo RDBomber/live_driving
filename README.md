@@ -23,6 +23,15 @@ scene_map: # Mapping of game scene IDs or names (when using RTTI) to OBS scenes
     timeout: 0
 ```
 
+# Scene names
+## IIDX
+- `CStandardStageScene`
+- `CLifeStageScene` (STEP UP mode)
+- `CDanStageScene`
+- `CPremiumFreeStageScene`
+- `CArenaStageScene`
+- `CBPLBattleStageScene`
+
 # Scene IDs (for use with `use_rtti: false`)
 Here are some IDs I've found while testing
 
