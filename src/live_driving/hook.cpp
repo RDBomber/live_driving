@@ -107,15 +107,7 @@ void live_driving::create_hooks(const game_info& game_data, app_config& config) 
 
         spdlog::info("scene change function found at: {}", static_cast<void*>(hook_target));
 
-        if (std::holds_alternative<void (*)(safetyhook::Context64&)>(callback)) {
-            auto cb = std::get<void (*)(safetyhook::Context64&)>(callback);
-            on_change_scene_hook = safetyhook::create_mid(hook_target, reinterpret_cast<safetyhook::MidHookFn>(cb));
-        } else if (std::holds_alternative<void (*)(safetyhook::Context32&)>(callback)) {
-            auto cb = std::get<void (*)(safetyhook::Context32&)>(callback);
-            on_change_scene_hook = safetyhook::create_mid(hook_target, reinterpret_cast<safetyhook::MidHookFn>(cb));
-        }
-
-        // on_change_scene_hook = safetyhook::create_mid(hook_target, callback);
+        on_change_scene_hook = safetyhook::create_mid(hook_target, std::get<safetyhook::MidHookFn>(callback));
 
         if(!config.obs_url.empty() && !config.obs_password.empty()) {
             client = new obs_client(config.obs_url, config.obs_password);
