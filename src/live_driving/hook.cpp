@@ -1,17 +1,10 @@
+#include <array>
 #include <spdlog/spdlog.h>
 #include <safetyhook.hpp>
 #include <rttidata.h>
 
 #include "live_driving/hook.hpp"
 
-#include <array>
-#include <array>
-#include <array>
-#include <array>
-#include <complex.h>
-#include <complex.h>
-#include <complex.h>
-#include <complex.h>
 
 #include "live_driving/util.hpp"
 
