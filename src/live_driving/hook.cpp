@@ -34,7 +34,7 @@ std::string live_driving::get_class_name(const std::uintptr_t base) {
     const auto vft = *reinterpret_cast<std::uint8_t**>(base);
     const auto loc = reinterpret_cast<_RTTICompleteObjectLocator*>(*reinterpret_cast<std::uintptr_t*>(vft - sizeof(void*)));
 #if defined(_WIN64)
-    const auto desc = reinterpret_cast<TypeDescriptor*>(static_cast<std::uint8_t*>(game_module.lpBaseOfDll) + loc->pTypeDescriptor);
+    const auto desc = reinterpret_cast<TypeDescriptor*>(static_cast<std::uint8_t*>(game.module_info.lpBaseOfDll) + loc->pTypeDescriptor);
 #else
     const auto desc = reinterpret_cast<TypeDescriptor*>(loc->pTypeDescriptor);
 #endif
