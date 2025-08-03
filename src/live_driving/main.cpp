@@ -8,6 +8,7 @@
 #include "live_driving/obs_client.hpp"
 #include "live_driving/hook.hpp"
 #include "live_driving/config.hpp"
+#include "live_driving/game.hpp"
 
 struct initialize_params {
     HMODULE dll_instance = nullptr;
@@ -15,10 +16,11 @@ struct initialize_params {
 };
 
 void handle_debug_mode() {
-    AllocConsole();
-    FILE* file;
-    freopen_s(&file, "CONOUT$", "w", stdout);
-    freopen_s(&file, "CONOUT$", "w", stderr);
+    if(AllocConsole()) {
+        FILE* file;
+        freopen_s(&file, "CONOUT$", "w", stdout);
+        freopen_s(&file, "CONOUT$", "w", stderr);
+    }
 
     spdlog::info("Debug mode enabled");
 }
@@ -45,21 +47,14 @@ live_driving::app_config get_config(const std::filesystem::path& config_path) {
     }
 }
 
-DWORD initialize(LPVOID param) {
+DWORD WINAPI initialize(LPVOID param) {
     auto* params = static_cast<initialize_params*>(param);
     auto config = params->config;
 
-    const std::vector<std::string> game_modules = {
-        "bm2dx.dll",
-        "soundvoltex.dll",
-        "sv6c.exe",
-        "bm2dx.exe",
-    };
-
     const auto current_process = GetCurrentProcess();
 
-    for(const auto& module : game_modules) {
-        const auto module_handle = GetModuleHandle(module.c_str());
+    for(const auto& [module, group] : live_driving::get_games()) {
+        const auto module_handle = GetModuleHandle(module);
         if(module_handle == nullptr) {
             continue;
         }
@@ -68,7 +63,12 @@ DWORD initialize(LPVOID param) {
 
         MODULEINFO module_info;
         GetModuleInformation(current_process, module_handle, &module_info, sizeof(module_info));
-        create_hooks(module_info, config);
+
+        live_driving::game_info game_info;
+        game_info.module_info = module_info;
+        game_info.group = group;
+
+        create_hooks(game_info, config);
         break;
     }
 

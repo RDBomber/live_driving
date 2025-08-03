@@ -3,61 +3,108 @@
 #include <rttidata.h>
 
 #include "live_driving/hook.hpp"
+
+#include <array>
+#include <array>
+#include <array>
+#include <array>
+#include <complex.h>
+#include <complex.h>
+#include <complex.h>
+#include <complex.h>
+
 #include "live_driving/util.hpp"
 
-std::string get_class_name(const MODULEINFO& module_info, const std::uintptr_t base) {
-    const auto vft = *reinterpret_cast<std::uint8_t**>(base);
-    const auto loc = reinterpret_cast<_RTTICompleteObjectLocator*>(*reinterpret_cast<std::uintptr_t*>(vft - sizeof(void*)));
-    const auto desc = reinterpret_cast<TypeDescriptor*>(static_cast<std::uint8_t*>(module_info.lpBaseOfDll) + loc->pTypeDescriptor);
-    return std::string(desc->name + 4, std::strlen(desc->name) - 6);
-}
-
-void live_driving::create_hooks(const MODULEINFO& module_info, app_config& config) {
-    static const auto game_module = module_info;
-
-    std::vector<std::tuple<std::string, safetyhook::MidHookFn>> patterns = {
-        {
-            "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 8B 41 48 45 0F",
-            [](safetyhook::Context& ctx) {
-                const auto scene_id = ctx.rdx;
-                on_change_scene(scene_id);
+auto live_driving::get_hooks() {
+    return std::array {
+        hook {
+            "89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7",
+            game_group::CBaseScene,
+            [](safetyhook::Context64& ctx) {
+                const auto scene_id = ctx.rcx;
+                const auto scene_name = get_class_name(ctx.rbx);
+                on_change_scene(scene_id, scene_name);
             }
         },
-        {
-            "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 41 48",
-            [](safetyhook::Context& ctx) {
-                const auto scene_id = ctx.rdx;
-                on_change_scene(scene_id);
+        hook {
+            "FF D0 81 4E",
+            game_group::sequence,
+            [](safetyhook::Context32& ctx) {
+                const auto scene_name = get_class_name(ctx.ecx);
+                on_change_scene(0, scene_name);
             }
         }
     };
+}
+
+std::string live_driving::get_class_name(const std::uintptr_t base) {
+    const auto vft = *reinterpret_cast<std::uint8_t**>(base);
+    const auto loc = reinterpret_cast<_RTTICompleteObjectLocator*>(*reinterpret_cast<std::uintptr_t*>(vft - sizeof(void*)));
+#if defined(_WIN64)
+    const auto desc = reinterpret_cast<TypeDescriptor*>(static_cast<std::uint8_t*>(game_module.lpBaseOfDll) + loc->pTypeDescriptor);
+#else
+    const auto desc = reinterpret_cast<TypeDescriptor*>(loc->pTypeDescriptor);
+#endif
+    return std::string(desc->name + 4, std::strlen(desc->name) - 6);
+}
+
+void live_driving::create_hooks(const game_info& game_data, app_config& config) {
+    game = game_data;
+
+    // auto constexpr patterns = std::array {
+    //     std::tuple {
+    //         "FF D0 81 4E",
+    //         [](safetyhook::Context& ctx) {
+    //             const auto scene_name = get_class_name(game_module, ctx.ecx);
+    //             on_change_scene(0, scene_name);
+    //         }
+    //     },
+    //     {
+    //         "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 48 89 7C 24 20 41 56 48 83 EC 20 48 8B 41 48 45 0F",
+    //         [](safetyhook::Context& ctx) {
+    //             const auto scene_id = ctx.rdx;
+    //             on_change_scene(scene_id);
+    //         }
+    //     },
+    //     {
+    //         "48 89 5C 24 08 48 89 6C 24 10 48 89 74 24 18 57 41 54 41 55 41 56 41 57 48 83 EC 20 48 8B 41 48",
+    //         [](safetyhook::Context& ctx) {
+    //             const auto scene_id = ctx.rdx;
+    //             on_change_scene(scene_id);
+    //         }
+    //     }
+    // };
 
     if (config.use_rtti) {
         // Arcade
-        const auto it = patterns.insert(patterns.begin(), {
-            "89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7",
-            [](safetyhook::Context& ctx) {
-                const auto scene_id = ctx.rcx;
-                const auto scene_name = get_class_name(game_module, ctx.rbx);
-                on_change_scene(scene_id, scene_name);
-            }
-        });
-
-        // INFINITAS
-        patterns.insert(it + 1, {
-            "89 05 ?? ?? ?? ?? 48 8B CB 48 8B 03 FF 50",
-            [](safetyhook::Context& ctx) {
-                const auto scene_id = ctx.rax;
-                const auto scene_name = get_class_name(game_module, ctx.rbx);
-                on_change_scene(scene_id, scene_name);
-            }
-        });
+        // const auto it = patterns.insert(patterns.begin(), {
+        //     "89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7",
+        //     [](safetyhook::Context& ctx) {
+        //         const auto scene_id = ctx.rcx;
+        //         const auto scene_name = get_class_name(game_module, ctx.rbx);
+        //         on_change_scene(scene_id, scene_name);
+        //     }
+        // });
+        //
+        // // INFINITAS
+        // patterns.insert(it + 1, {
+        //     "89 05 ?? ?? ?? ?? 48 8B CB 48 8B 03 FF 50",
+        //     [](safetyhook::Context& ctx) {
+        //         const auto scene_id = ctx.rax;
+        //         const auto scene_name = get_class_name(game_module, ctx.rbx);
+        //         on_change_scene(scene_id, scene_name);
+        //     }
+        // });
     }
 
-    for(const auto& [pattern, callback] : patterns) {
+    for(const auto& [pattern, group, callback] : get_hooks()) {
+        if(group != game.group) {
+            continue;
+        }
+
         const auto hook_target = find_pattern(
-            static_cast<std::uint8_t*>(module_info.lpBaseOfDll),
-            module_info.SizeOfImage,
+            static_cast<std::uint8_t*>(game.module_info.lpBaseOfDll),
+            game.module_info.SizeOfImage,
             pattern
         );
 
@@ -66,7 +113,16 @@ void live_driving::create_hooks(const MODULEINFO& module_info, app_config& confi
         }
 
         spdlog::info("scene change function found at: {}", static_cast<void*>(hook_target));
-        on_change_scene_hook = create_mid(hook_target, callback);
+
+        if (std::holds_alternative<void (*)(safetyhook::Context64&)>(callback)) {
+            auto cb = std::get<void (*)(safetyhook::Context64&)>(callback);
+            on_change_scene_hook = safetyhook::create_mid(hook_target, reinterpret_cast<safetyhook::MidHookFn>(cb));
+        } else if (std::holds_alternative<void (*)(safetyhook::Context32&)>(callback)) {
+            auto cb = std::get<void (*)(safetyhook::Context32&)>(callback);
+            on_change_scene_hook = safetyhook::create_mid(hook_target, reinterpret_cast<safetyhook::MidHookFn>(cb));
+        }
+
+        // on_change_scene_hook = safetyhook::create_mid(hook_target, callback);
 
         if(!config.obs_url.empty() && !config.obs_password.empty()) {
             client = new obs_client(config.obs_url, config.obs_password);
@@ -84,6 +140,10 @@ void live_driving::create_hooks(const MODULEINFO& module_info, app_config& confi
 }
 
 void live_driving::on_change_scene(std::uint64_t scene_id, const std::string& scene_name) {
+    if (scene_name.find("Actor") != std::string::npos) {
+        return;
+    }
+
     if (scene_name.empty()) {
         spdlog::info("Scene changed to {}", scene_id);
     } else {
@@ -104,3 +164,4 @@ void live_driving::on_change_scene(std::uint64_t scene_id, const std::string& sc
         client->switch_scene(map["default"]);
     }
 }
+
