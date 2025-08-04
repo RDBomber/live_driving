@@ -29,7 +29,7 @@ live_driving::obs_client::obs_client(std::string url, std::string password): url
     connect();
 }
 
-void live_driving::obs_client::switch_scene(const scene_config& config) const {
+void live_driving::obs_client::switch_scene(const std::string& name, std::uint64_t timeout) const {
     if(!authenticated) {
         return;
     }
@@ -53,10 +53,61 @@ void live_driving::obs_client::switch_scene(const scene_config& config) const {
     payload["d"].AddMember(request_data_key, rapidjson::Value(rapidjson::kObjectType), payload.GetAllocator());
 
     rapidjson::Value scene_name_key("sceneName", payload.GetAllocator());
-    rapidjson::Value scene_name_value(config.obs_scene.c_str(), payload.GetAllocator());
+    rapidjson::Value scene_name_value(name.c_str(), payload.GetAllocator());
     payload["d"]["requestData"].AddMember(scene_name_key, scene_name_value, payload.GetAllocator());
 
-    auto timeout = config.timeout;
+    std::thread([this, payload = std::move(payload), timeout] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        send(payload);
+    }).detach();
+}
+
+void live_driving::obs_client::begin_recording(std::uint64_t timeout) const {
+    if(!authenticated) {
+        return;
+    }
+
+    rapidjson::Document payload;
+    payload.SetObject();
+
+    rapidjson::Value op_key("op", payload.GetAllocator());
+    payload.AddMember(op_key, 6, payload.GetAllocator());
+
+    rapidjson::Value d_key("d", payload.GetAllocator());
+    payload.AddMember(d_key, rapidjson::Value(rapidjson::kObjectType), payload.GetAllocator());
+
+    rapidjson::Value request_type_key("requestType", payload.GetAllocator());
+    payload["d"].AddMember(request_type_key, "StartRecord", payload.GetAllocator());
+
+    rapidjson::Value request_id_key("requestId", payload.GetAllocator());
+    payload["d"].AddMember(request_id_key, "1", payload.GetAllocator());
+
+    std::thread([this, payload = std::move(payload), timeout] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        send(payload);
+    }).detach();
+}
+
+void live_driving::obs_client::end_recording(std::uint64_t timeout) const {
+    if(!authenticated) {
+        return;
+    }
+
+    rapidjson::Document payload;
+    payload.SetObject();
+
+    rapidjson::Value op_key("op", payload.GetAllocator());
+    payload.AddMember(op_key, 6, payload.GetAllocator());
+
+    rapidjson::Value d_key("d", payload.GetAllocator());
+    payload.AddMember(d_key, rapidjson::Value(rapidjson::kObjectType), payload.GetAllocator());
+
+    rapidjson::Value request_type_key("requestType", payload.GetAllocator());
+    payload["d"].AddMember(request_type_key, "StopRecord", payload.GetAllocator());
+
+    rapidjson::Value request_id_key("requestId", payload.GetAllocator());
+    payload["d"].AddMember(request_id_key, "1", payload.GetAllocator());
+
     std::thread([this, payload = std::move(payload), timeout] {
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
         send(payload);

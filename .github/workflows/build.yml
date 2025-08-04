@@ -6,15 +6,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  job:
+  build:
     name: Build project
     runs-on: windows-latest
     strategy:
-      fail-fast: false
       matrix:
-        os: [windows-latest]
+        arch: [x64, x86]
+        include:
+          - arch: x64
+            triplet: x64-windows-static
+            artifact_name: live_driving_64
+          - arch: x86
+            triplet: x86-windows-static
+            artifact_name: live_driving_32
+
     env:
-      VCPKG_DEFAULT_TRIPLET: x64-windows-static
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
 
     steps:
       - name: Checkout
@@ -33,11 +40,11 @@ jobs:
       - name: Run CMake
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'ninja-multi-config'
-          buildPreset: 'release'
+          configurePreset: ${{ matrix.arch }}
+          buildPreset: ${{ matrix.arch }}-release
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: live_driving
-          path: build/ninja-multi-config/Release
+          name: ${{ matrix.artifact_name }}
+          path: build/${{ matrix.arch }}/Release

@@ -1,11 +1,17 @@
 obs_url: "ws://localhost:4455"
 obs_password: "password"
 debug: true
-use_rtti: true
 scene_map:
-  CTestModeFlow:
-    obs_scene: "IIDX"
-    timeout: 1000
+  CStandardStageScene:
+    - action: change_scene
+      param: "IIDX"
+      timeout: 0
+    - action: start_recording
+      timeout: 0
+  CStageResultScene:
+    - action: stop_recording
+      timeout: 5000
   default:
-    obs_scene: "IIDX no cam"
-    timeout: 0
+    - action: change_scene
+      param: "IIDX no cam"
+      timeout: 0
