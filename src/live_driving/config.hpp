@@ -15,7 +15,6 @@ namespace live_driving {
         std::string obs_url;
         std::string obs_password;
         bool debug = false;
-        bool use_rtti = false;
         std::unordered_map<std::string, scene_config> scene_map;
     };
 
@@ -29,7 +28,6 @@ struct YAML::convert<live_driving::app_config> {
             "obs_url",
             "obs_password",
             "debug",
-            "use_rtti",
             "scene_map",
         };
 
@@ -46,7 +44,6 @@ struct YAML::convert<live_driving::app_config> {
         rhs.obs_url = node["obs_url"].as<std::string>();
         rhs.obs_password = node["obs_password"].as<std::string>();
         rhs.debug = node["debug"].as<bool>();
-        rhs.use_rtti = node["use_rtti"].as<bool>();
         rhs.scene_map = node["scene_map"].as<std::unordered_map<std::string, live_driving::scene_config>>();
 
         return true;

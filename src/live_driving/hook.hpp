@@ -2,7 +2,6 @@
 
 #include <safetyhook.hpp>
 #include <windows.h>
-#include <psapi.h>
 #include <variant>
 
 #include "live_driving/obs_client.hpp"
@@ -17,6 +16,7 @@ namespace live_driving {
 
     struct hook {
         const char* pattern;
+        const char* description;
         game_group group;
         callback_fn callback;
     };
@@ -27,7 +27,7 @@ namespace live_driving {
     inline game_info game;
 
     void create_hooks(const game_info& game_data, app_config& config);
-    void on_change_scene(std::uint64_t scene_id, const std::string& scene_name = "");
+    void on_change_scene(const std::string& scene_name);
     std::string get_class_name(std::uintptr_t address);
 
     auto get_hooks();

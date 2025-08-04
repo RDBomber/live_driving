@@ -69,7 +69,7 @@ DWORD WINAPI initialize(LPVOID param) {
         game_info.group = group;
 
         create_hooks(game_info, config);
-        break;
+        return EXIT_SUCCESS;
     }
 
     spdlog::warn("Could not find any supported game modules");
