@@ -31,4 +31,5 @@ namespace live_driving {
     std::string get_class_name(std::uintptr_t address);
     auto get_hooks();
     void handle_scene_actions(const std::vector<scene_action>& actions);
+    std::string process_scene_name(const std::string& scene_name);
 }

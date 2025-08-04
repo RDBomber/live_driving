@@ -30,9 +30,9 @@ live_driving::obs_client::obs_client(std::string url, std::string password): url
 }
 
 void live_driving::obs_client::switch_scene(const std::string& name, std::uint64_t timeout) const {
-    // if(!authenticated) {
-    //     return;
-    // }
+    if(!authenticated) {
+        return;
+    }
 
     rapidjson::Document payload;
     payload.SetObject();
@@ -63,6 +63,10 @@ void live_driving::obs_client::switch_scene(const std::string& name, std::uint64
 }
 
 void live_driving::obs_client::begin_recording(std::uint64_t timeout) const {
+    if(!authenticated) {
+        return;
+    }
+
     rapidjson::Document payload;
     payload.SetObject();
 
@@ -85,6 +89,10 @@ void live_driving::obs_client::begin_recording(std::uint64_t timeout) const {
 }
 
 void live_driving::obs_client::end_recording(std::uint64_t timeout) const {
+    if(!authenticated) {
+        return;
+    }
+
     rapidjson::Document payload;
     payload.SetObject();
 

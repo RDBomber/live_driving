@@ -127,14 +127,16 @@ void live_driving::on_change_scene(const std::string& scene_name) {
         return;
     }
 
-    spdlog::info("Scene changed to {}", scene_name);
+    auto processed_name = process_scene_name(scene_name);
+
+    spdlog::info("Scene changed to {}", processed_name);
 
     if(client == nullptr) {
         return;
     }
 
-    if (!scene_name.empty() && config.scene_map.contains(scene_name)) {
-        handle_scene_actions(config.scene_map[scene_name]);
+    if (!scene_name.empty() && config.scene_map.contains(processed_name)) {
+        handle_scene_actions(config.scene_map[processed_name]);
     }
     else if(config.scene_map.contains("default")) {
         handle_scene_actions(config.scene_map["default"]);
@@ -156,5 +158,14 @@ void live_driving::handle_scene_actions(const std::vector<scene_action>& actions
             spdlog::warn("Unknown action: {}", action.action);
         }
     }
+}
+
+std::string live_driving::process_scene_name(const std::string& scene_name) {
+    if(const auto at_pos = scene_name.find('@'); at_pos != std::string::npos) {
+        auto processed_name = scene_name.substr(0, at_pos);
+        return processed_name;
+    }
+
+    return scene_name;
 }
 

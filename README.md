@@ -4,6 +4,7 @@ This is a simple dll hook for capturing scene changes in select BEMANI games.
 # Supported games
 - beatmania IIDX (including コナステ)
 - SOUND VOLTEX (including コナステ)
+- DanceDanceRevolution
 
 # Usage
 Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.yaml` is placed next to `live_driving.dll`.
@@ -12,14 +13,31 @@ Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.y
 ```yml
 obs_url: "ws://localhost:4455" # The address of your OBS websocket server
 obs_password: "password" # Optional password if you wish to use authorization
-scene_map: # Mapping of game scene IDs or names (when using RTTI) to OBS scenes
+scene_map: # Mapping of game scene IDs or names to a set of specific actions
   CTestModeFlow:
-    obs_scene: "IIDX"
-    timeout: 1000 # Time in milliseconds after which the request will be sent to your OBS client
-  default: # default will trigger on any scene that is not mapped, you can also omit this if you don't want that behaviour
-    obs_scene: "IIDX no cam"
-    timeout: 0
+    - action: change_scene # Refer to "Actions" section for available actions
+      param: "IIDX"
+      timeout: 0 # Timeout in milliseconds before the action is executed
+    - action: start_recording
+      timeout: 3000
+  CCardEntryScene:
+    - action: stop_recording
+      timeout: 0
+  default: # "default" scene will trigger on every unmapped scene, delete this section to disable
+    - action: change_scene
+      param: "IIDX no cam"
+      timeout: 0
 ```
+
+## Actions
+### `change_scene`
+Changes the OBS scene to the specified name in `param`.
+
+### `start_recording`
+Starts recording in OBS.
+
+### `stop_recording`
+Stops recording in OBS.
 
 # Scene names
 ## IIDX
@@ -30,8 +48,12 @@ scene_map: # Mapping of game scene IDs or names (when using RTTI) to OBS scenes
 - `CArenaStageScene`
 - `CBPLBattleStageScene`
 
-# Scene IDs
+## DDR
+- `SelectMusicSequence` - On music select
+- `DancePlaySequence` - On game play
+- `ResultSequence` - On result screen
 
+# Scene IDs
 ## IIDX 31 (may work for other versions)
 - 66 - DAN COURSE gameplay
 - 69 - STANDARD gameplay
