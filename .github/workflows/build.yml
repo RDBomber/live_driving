@@ -6,11 +6,22 @@ on:
   workflow_dispatch:
 
 jobs:
-  job:
+  build:
     name: Build project
     runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [x64, x86]
+        include:
+          - arch: x64
+            triplet: x64-windows-static
+            artifact_name: live_driving_64
+          - arch: x86
+            triplet: x86-windows-static
+            artifact_name: live_driving_32
+
     env:
-      VCPKG_DEFAULT_TRIPLET: x64-windows-static
+      VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
 
     steps:
       - name: Checkout
@@ -29,11 +40,11 @@ jobs:
       - name: Run CMake
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'x64'
-          buildPreset: 'x64-release'
+          configurePreset: ${{ matrix.arch }}
+          buildPreset: ${{ matrix.arch }}-release
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: live_driving_64
-          path: build/x64/Release
+          name: ${{ matrix.artifact_name }}
+          path: build/${{ matrix.arch }}/Release
