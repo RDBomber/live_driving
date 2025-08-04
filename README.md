@@ -14,15 +14,15 @@ Inject `live_driving.dll` with your preferred toolset. Make sure `live_driving.y
 obs_url: "ws://localhost:4455" # The address of your OBS websocket server
 obs_password: "password" # Optional password if you wish to use authorization
 scene_map: # Mapping of game scene IDs or names to a set of specific actions
-  CTestModeFlow:
+  CStandardStageScene:
     - action: change_scene # Refer to "Actions" section for available actions
       param: "IIDX"
       timeout: 0 # Timeout in milliseconds before the action is executed
     - action: start_recording
-      timeout: 3000
-  CCardEntryScene:
-    - action: stop_recording
       timeout: 0
+  CStageResultScene:
+    - action: stop_recording
+      timeout: 5000
   default: # "default" scene will trigger on every unmapped scene, delete this section to disable
     - action: change_scene
       param: "IIDX no cam"
