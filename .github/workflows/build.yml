@@ -9,10 +9,6 @@ jobs:
   job:
     name: Build project
     runs-on: windows-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest]
     env:
       VCPKG_DEFAULT_TRIPLET: x64-windows-static
 
@@ -33,11 +29,11 @@ jobs:
       - name: Run CMake
         uses: lukka/run-cmake@v10
         with:
-          configurePreset: 'ninja-multi-config'
-          buildPreset: 'release'
+          configurePreset: 'x64'
+          buildPreset: 'x64-release'
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: live_driving
-          path: build/ninja-multi-config/Release
+          name: live_driving_64
+          path: build/x64/Release
