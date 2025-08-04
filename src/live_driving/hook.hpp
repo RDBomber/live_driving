@@ -23,12 +23,12 @@ namespace live_driving {
 
     inline safetyhook::MidHook on_change_scene_hook;
     inline obs_client* client;
-    inline std::unordered_map<std::string, scene_config> map;
+    inline app_config config;
     inline game_info game;
 
-    void create_hooks(const game_info& game_data, app_config& config);
+    void create_hooks(const game_info& game_data, app_config& cfg);
     void on_change_scene(const std::string& scene_name);
     std::string get_class_name(std::uintptr_t address);
-
     auto get_hooks();
+    void handle_scene_actions(const std::vector<scene_action>& actions);
 }

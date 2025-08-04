@@ -85,8 +85,9 @@ std::string live_driving::get_class_name(const std::uintptr_t base) {
     return std::string(desc->name + 4, std::strlen(desc->name) - 6);
 }
 
-void live_driving::create_hooks(const game_info& game_data, app_config& config) {
+void live_driving::create_hooks(const game_info& game_data, app_config& cfg) {
     game = game_data;
+    config = cfg;
 
     for(const auto& hook : get_hooks()) {
         if(hook.group != game.group) {
@@ -109,7 +110,6 @@ void live_driving::create_hooks(const game_info& game_data, app_config& config) 
 
         if(!config.obs_url.empty() && !config.obs_password.empty()) {
             client = new obs_client(config.obs_url, config.obs_password);
-            map = config.scene_map;
 
             std::thread([] {
                 client->listen();
@@ -133,11 +133,28 @@ void live_driving::on_change_scene(const std::string& scene_name) {
         return;
     }
 
-    if (!scene_name.empty() && map.contains(scene_name)) {
-        client->switch_scene(map[scene_name]);
+    if (!scene_name.empty() && config.scene_map.contains(scene_name)) {
+        handle_scene_actions(config.scene_map[scene_name]);
     }
-    else if(map.contains("default")) {
-        client->switch_scene(map["default"]);
+    else if(config.scene_map.contains("default")) {
+        handle_scene_actions(config.scene_map["default"]);
+    }
+}
+
+void live_driving::handle_scene_actions(const std::vector<scene_action>& actions) {
+    for(const auto& action : actions) {
+        if(action.action == "change_scene") {
+            client->switch_scene(action.param, action.timeout);
+        }
+        else if(action.action == "start_recording") {
+            client->begin_recording(action.timeout);
+        }
+        else if(action.action == "stop_recording") {
+            client->end_recording(action.timeout);
+        }
+        else {
+            spdlog::warn("Unknown action: {}", action.action);
+        }
     }
 }
 

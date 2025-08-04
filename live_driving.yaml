@@ -3,8 +3,15 @@ obs_password: "password"
 debug: true
 scene_map:
   CTestModeFlow:
-    obs_scene: "IIDX"
-    timeout: 1000
+    - action: change_scene
+      param: "IIDX"
+      timeout: 0
+    - action: start_recording
+      timeout: 3000
+  CCardEntryScene:
+    - action: stop_recording
+      timeout: 0
   default:
-    obs_scene: "IIDX no cam"
-    timeout: 0
+    - action: change_scene
+      param: "IIDX no cam"
+      timeout: 0

@@ -12,7 +12,9 @@ namespace live_driving {
         obs_client(std::string url, std::string password);
 
         void listen();
-        void switch_scene(const scene_config& config) const;
+        void switch_scene(const std::string& name, std::uint64_t timeout) const;
+        void begin_recording(std::uint64_t timeout) const;
+        void end_recording(std::uint64_t timeout) const;
 
     private:
         static inline bool curl_initialized = false;
