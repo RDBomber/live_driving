@@ -54,6 +54,11 @@ Stops recording in OBS.
 - `DancePlaySequence` - On game play
 - `ResultSequence` - On result screen
 
+## SDVX (コナステ)
+- `CMusicSelectScene`
+- `AlternativeGameScene` - On game play
+- `CResultScene`
+
 # Scene IDs
 ## IIDX 31 (may work for other versions)
 - 66 - DAN COURSE gameplay
