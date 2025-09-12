@@ -68,6 +68,7 @@ Stops recording in OBS.
 ## SOUND VOLTEX (コナステ)
 - 16 - Music Select
 - 40 - Gameplay
+- 42 - TRAINING gameplay
 - 14 - Result
 - 33 - SKILL ANALYZER select
 - 15 - SKILL ANALYZER result
