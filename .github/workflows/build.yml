@@ -25,9 +25,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: recursive
+          fetch-depth: 0
 
       - name: Get CMake
         uses: lukka/get-cmake@latest
@@ -44,7 +45,7 @@ jobs:
           buildPreset: ${{ matrix.arch }}-release
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
           path: build/${{ matrix.arch }}/Release
