@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <string>
 #include <curl/curl.h>
 #include <rapidjson/document.h>
@@ -26,6 +27,10 @@ namespace live_driving {
         std::string password;
 
         CURL* curl = nullptr;
+
+        mutable std::atomic<std::uint64_t> switch_scene_gen{0};
+        mutable std::atomic<std::uint64_t> begin_recording_gen{0};
+        mutable std::atomic<std::uint64_t> end_recording_gen{0};
 
         void connect();
 

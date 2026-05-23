@@ -56,8 +56,12 @@ void live_driving::obs_client::switch_scene(const std::string& name, std::uint64
     rapidjson::Value scene_name_value(name.c_str(), payload.GetAllocator());
     payload["d"]["requestData"].AddMember(scene_name_key, scene_name_value, payload.GetAllocator());
 
-    std::thread([this, payload = std::move(payload), timeout] {
+    const auto gen = ++switch_scene_gen;
+    std::thread([this, payload = std::move(payload), timeout, gen] {
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        if(gen != switch_scene_gen.load()) {
+            return;
+        }
         send(payload);
     }).detach();
 }
@@ -82,8 +86,12 @@ void live_driving::obs_client::begin_recording(std::uint64_t timeout) const {
     rapidjson::Value request_id_key("requestId", payload.GetAllocator());
     payload["d"].AddMember(request_id_key, "1", payload.GetAllocator());
 
-    std::thread([this, payload = std::move(payload), timeout] {
+    const auto gen = ++begin_recording_gen;
+    std::thread([this, payload = std::move(payload), timeout, gen] {
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        if(gen != begin_recording_gen.load()) {
+            return;
+        }
         send(payload);
     }).detach();
 }
@@ -108,8 +116,12 @@ void live_driving::obs_client::end_recording(std::uint64_t timeout) const {
     rapidjson::Value request_id_key("requestId", payload.GetAllocator());
     payload["d"].AddMember(request_id_key, "1", payload.GetAllocator());
 
-    std::thread([this, payload = std::move(payload), timeout] {
+    const auto gen = ++end_recording_gen;
+    std::thread([this, payload = std::move(payload), timeout, gen] {
         std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
+        if(gen != end_recording_gen.load()) {
+            return;
+        }
         send(payload);
     }).detach();
 }

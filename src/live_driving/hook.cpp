@@ -29,11 +29,11 @@ auto live_driving::get_hooks() {
             }
         },
         hook {
-            "48 8D 0D ?? ?? ?? ?? 33 F6 C7 44",
-            "CBaseScene Arcade SDVX RTTI hook",
+            "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 48 89 7C 24 ?? 41 56 48 83 EC ?? 80 3D ?? ?? ?? ?? ?? 48 8B F9",
+            "CBaseScene Arcade SDVX RTTI hook (Attach dispatcher)",
             game_group::CBaseScene,
             [](safetyhook::Context64& ctx) {
-                const auto scene_name = get_class_name(ctx.rsi);
+                const auto scene_name = get_class_name(ctx.rcx);
                 on_change_scene(scene_name);
             }
         },
