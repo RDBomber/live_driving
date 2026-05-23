@@ -19,6 +19,7 @@ namespace live_driving {
         const char* description;
         game_group group;
         callback_fn callback;
+        const char* dll = nullptr;
     };
 
     inline safetyhook::MidHook on_change_scene_hook;

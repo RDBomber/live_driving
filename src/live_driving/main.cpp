@@ -67,6 +67,7 @@ DWORD WINAPI initialize(LPVOID param) {
         live_driving::game_info game_info;
         game_info.module_info = module_info;
         game_info.group = group;
+        game_info.module_name = module;
 
         create_hooks(game_info, config);
         return EXIT_SUCCESS;

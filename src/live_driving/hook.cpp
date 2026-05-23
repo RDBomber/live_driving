@@ -1,4 +1,5 @@
 #include <array>
+#include <cstring>
 #include <spdlog/spdlog.h>
 #include <safetyhook.hpp>
 #include <rttidata.h>
@@ -8,6 +9,16 @@
 
 auto live_driving::get_hooks() {
     return std::array {
+        hook {
+            "4C 8B F8 48 8B 08 48 8B 51 40 48 8B C8 FF D2",
+            "CBaseScene Arcade pop'n music RTTI hook",
+            game_group::CBaseScene,
+            [](safetyhook::Context64& ctx) {
+                const auto scene_name = get_class_name(ctx.rax);
+                on_change_scene(scene_name);
+            },
+            "popn.dll",
+        },
         hook {
             "89 05 ?? ?? ?? ?? E8 ?? ?? ?? ?? 48 8B D7",
             "CBaseScene Arcade IIDX RTTI hook",
@@ -91,6 +102,11 @@ void live_driving::create_hooks(const game_info& game_data, app_config& cfg) {
 
     for(const auto& hook : get_hooks()) {
         if(hook.group != game.group) {
+            continue;
+        }
+
+        if(hook.dll != nullptr && game.module_name != nullptr
+           && std::strcmp(hook.dll, game.module_name) != 0) {
             continue;
         }
 

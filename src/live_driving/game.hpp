@@ -12,6 +12,7 @@ namespace live_driving {
     struct game_info {
         MODULEINFO module_info;
         game_group group;
+        const char* module_name = nullptr;
     };
 
     auto get_games();
@@ -33,6 +34,10 @@ inline auto live_driving::get_games() {
         },
         std::tuple {
             "sv6c.exe",
+            game_group::CBaseScene,
+        },
+        std::tuple {
+            "popn.dll",
             game_group::CBaseScene,
         },
         std::tuple {
